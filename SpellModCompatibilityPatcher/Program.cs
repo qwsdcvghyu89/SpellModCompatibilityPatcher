@@ -26,9 +26,6 @@ namespace SpellModCompatibilityPatcher {
         }
 
         private static async Task RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state) {
-            if (!Debugger.IsAttached)
-                Debugger.Launch();
-
             var vanillaCaches = GetVanillaLinkCaches(state.LoadOrder);
             var vanillaKeys = new HashSet<ModKey>(Settings.Value.BaseMods);
             var spells = state.LoadOrder.PriorityOrder.Spell().WinningContextOverrides(true);
