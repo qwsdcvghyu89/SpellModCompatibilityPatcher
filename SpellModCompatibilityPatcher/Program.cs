@@ -34,7 +34,9 @@ namespace SpellModCompatibilityPatcher {
             var bookOverrides = GetOverrides(vanillaCaches, vanillaKeys, books, 
                 (x)=>x is IBookSpellGetter); // filter for only spell tomes            
 
+            Console.WriteLine("BOOK OVERRIDES ====================");
             PrintOverrides(bookOverrides);
+            Console.WriteLine("SPELL OVERRIDES ====================");
             PrintOverrides(spellOverrides);
 
             var updatedBookOverrides = UpdateOverrides<IBook, IBookGetter>(state.LoadOrder, Settings.Value.PreferredOverrideOrder);
@@ -47,7 +49,9 @@ namespace SpellModCompatibilityPatcher {
 
             Console.WriteLine("Finished forwarding overrides based on priority");
 
+            Console.WriteLine("BOOK OVERRIDES ====================");
             PrintOverrides(updatedBookOverridesList);
+            Console.WriteLine("SPELL OVERRIDES ====================");
             PrintOverrides(updatedSpellOverridesList);
 
             if (!Debugger.IsAttached)
