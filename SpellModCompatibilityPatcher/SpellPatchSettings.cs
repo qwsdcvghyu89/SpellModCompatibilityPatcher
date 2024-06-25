@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace SpellModCompatibilityPatcher {
     public class SpellPatchSettings {
-        public int TestSetting = 0;
         public List<ModKey> BaseMods = [
             ModKey.FromNameAndExtension("Skyrim.esm"),
             ModKey.FromNameAndExtension("Update.esm"),
