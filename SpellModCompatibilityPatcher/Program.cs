@@ -53,8 +53,8 @@ namespace SpellModCompatibilityPatcher {
             if (!Debugger.IsAttached)
                 Debugger.Launch();
 
-            ApplyOverride<IBook, IBookGetter>(state, updatedBookOverridesList);
-            ApplyOverride<ISpell, ISpellGetter>(state, updatedSpellOverrides);
+            ApplyOverride<Book, IBookGetter>(state, updatedBookOverridesList);
+            ApplyOverride<Spell, ISpellGetter>(state, updatedSpellOverrides);
         }
 
         private static void ApplyOverride<TMajor, TMajorGetter>(IPatcherState<ISkyrimMod, ISkyrimModGetter> state, IEnumerable<Override<TMajorGetter>> overrides) where TMajor : class, IMajorRecord, IMajorRecordQueryable, TMajorGetter where TMajorGetter : class, IMajorRecordGetter, IMajorRecordQueryableGetter {
@@ -80,7 +80,7 @@ namespace SpellModCompatibilityPatcher {
                 Console.WriteLine($"Found {overrides.Count} {typeof(T).Name} overrides");
             foreach (var @override in overrides) {
 
-                Console.WriteLine($"{typeof(T).Name} '{GetName(@override.OriginalRecord)}' has been overriden by '{GetName(@override.OverridingRecord)}'");
+                Console.WriteLine($"{typeof(T).Name} '{GetName(@override.OriginalRecord)}' from [{@override.OriginalMod.Name}] has been overriden by '{GetName(@override.OverridingRecord)}' from [@{@override.OverridingMod.Name}]");
             }
         }
 
