@@ -26,23 +26,23 @@ namespace SpellModCompatibilityPatcher {
         }
 
         private static async Task RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state) {
-            var vanillaCaches = GetVanillaLinkCaches(state.LoadOrder);
-            var vanillaKeys = new HashSet<ModKey>(Settings.Value.BaseMods);
-            var spells = state.LoadOrder.PriorityOrder.Spell().WinningContextOverrides(true);
-            var books = state.LoadOrder.PriorityOrder.Book().WinningContextOverrides(true);
-            var spellOverrides = GetOverrides(vanillaCaches, vanillaKeys, spells);
-            var bookOverrides = GetOverrides(vanillaCaches, vanillaKeys, books, 
-                (x)=>x.Teaches is IBookSpellGetter); // filter for only spell tomes            
+            //var vanillaCaches = GetVanillaLinkCaches(state.LoadOrder);
+            //var vanillaKeys = new HashSet<ModKey>(Settings.Value.BaseMods);
+            //var spells = state.LoadOrder.PriorityOrder.Spell().WinningContextOverrides(true);
+            //var books = state.LoadOrder.PriorityOrder.Book().WinningContextOverrides(true);
+            //var spellOverrides = GetOverrides(vanillaCaches, vanillaKeys, spells);
+            //var bookOverrides = GetOverrides(vanillaCaches, vanillaKeys, books, 
+            //    (x)=>x.Teaches is IBookSpellGetter); // filter for only spell tomes            
 
-            Console.WriteLine("BOOK OVERRIDES ====================");
-            PrintOverrides(bookOverrides);
-            Console.WriteLine("SPELL OVERRIDES ====================");
-            PrintOverrides(spellOverrides);
+            //Console.WriteLine("BOOK OVERRIDES ====================");
+            //PrintOverrides(bookOverrides);
+            //Console.WriteLine("SPELL OVERRIDES ====================");
+            //PrintOverrides(spellOverrides);
 
             var updatedBookOverrides = UpdateOverrides<IBook, IBookGetter>(state.LoadOrder, Settings.Value.PreferredOverrideOrder);
             var updatedSpellOverrides = UpdateOverrides<ISpell, ISpellGetter>(state.LoadOrder, Settings.Value.PreferredOverrideOrder);
-            updatedBookOverrides = WeedAlreadyWinningOverrides<IBook, IBookGetter>(state.LinkCache, updatedBookOverrides);
-            updatedSpellOverrides = WeedAlreadyWinningOverrides<ISpell, ISpellGetter>(state.LinkCache, updatedSpellOverrides);
+            //updatedBookOverrides = WeedAlreadyWinningOverrides<IBook, IBookGetter>(state.LinkCache, updatedBookOverrides);
+            //updatedSpellOverrides = WeedAlreadyWinningOverrides<ISpell, ISpellGetter>(state.LinkCache, updatedSpellOverrides);
 
             var updatedBookOverridesList = updatedBookOverrides.ToList();
             var updatedSpellOverridesList = updatedSpellOverrides.ToList();
@@ -98,7 +98,7 @@ namespace SpellModCompatibilityPatcher {
                 foreach(var record in records) {
                     if (overrides.ContainsKey(record.Record.FormKey.ID))
                         continue;
-                    var @override = new Override<TMajorGetter>(null, modKey, null, record.Record);
+                    var @override = new Override<TMajorGetter>(ModKey.Null, modKey, null, record.Record);
                     overrides[record.Record.FormKey.ID] = @override;
                 }
             }
@@ -106,19 +106,18 @@ namespace SpellModCompatibilityPatcher {
             return overrides.Values;
         }
 
-        private static List<Override<TMajorGetter>> WeedAlreadyWinningOverrides<TMajor, TMajorGetter>(ILinkCache<ISkyrimMod, ISkyrimModGetter> linkCache, IEnumerable<Override<TMajorGetter>> overrides) where TMajor : class, IMajorRecord, IMajorRecordQueryable, TMajorGetter where TMajorGetter : class, IMajorRecordGetter, IMajorRecordQueryableGetter {
-            List<Override<TMajorGetter>> weededOverrides = [];
-            foreach(var @override in overrides) {
-                var record = @override.OverridingRecord;
-                if (!linkCache.TryResolve<TMajorGetter>(@override.OverridingRecord.FormKey, out var originalRecord))
-                    continue;
-                if (record.FormKey.ModKey == originalRecord.FormKey.ModKey)
-                    continue;
-                weededOverrides.Add(new Override<TMajorGetter>(originalRecord.FormKey.ModKey, record.FormKey.ModKey, originalRecord, record));
-            }
+        //private static List<Override<TMajorGetter>> WeedAlreadyWinningOverrides<TMajor, TMajorGetter>(ILinkCache<ISkyrimMod, ISkyrimModGetter> linkCache, IEnumerable<Override<TMajorGetter>> overrides) where TMajor : class, IMajorRecord, IMajorRecordQueryable, TMajorGetter where TMajorGetter : class, IMajorRecordGetter, IMajorRecordQueryableGetter {
+        //    List<Override<TMajorGetter>> weededOverrides = [];
+        //    foreach(var @override in overrides) {
+        //        var record = @override.OverridingRecord;
+        //        foreach(var formMutatators in linkCache.ResolveAll<TMajorGetter>(record.FormKey, ResolveTarget.Winner)) {
+                    
+        //        }
+        //        weededOverrides.Add(new Override<TMajorGetter>(originalRecord.FormKey.ModKey, record.FormKey.ModKey, originalRecord, record));
+        //    }
 
-            return weededOverrides;
-        }
+        //    return weededOverrides;
+        //}
 
         private static Dictionary<ModKey, IEnumerable<IModContext<TMajorGetter>>> GetRecordAddingMods<TMajor, TMajorGetter>(ILoadOrder<IModListing<ISkyrimModGetter>> loadOrder) where TMajor : class, IMajorRecord, IMajorRecordQueryable, TMajorGetter where TMajorGetter : class, IMajorRecordGetter, IMajorRecordQueryableGetter {
             Dictionary<ModKey, IEnumerable<IModContext<TMajorGetter>>> dict = [];
@@ -163,20 +162,20 @@ namespace SpellModCompatibilityPatcher {
             return overrides;
         }
 
-        private static List<ImmutableModLinkCache<ISkyrimMod, ISkyrimModGetter>> GetVanillaLinkCaches(
-                ILoadOrder<IModListing<ISkyrimModGetter>> loadOrder) {
-            if (!TryGetLinkCache("Skyrim.esm", loadOrder, out var skyrim))
-                throw new Exception();
-            List<ImmutableModLinkCache<ISkyrimMod, ISkyrimModGetter>> caches = [skyrim];
-            foreach(var baseMod in Settings?.Value.BaseMods ?? []) {
-                TryGetLinkCache(baseMod, loadOrder, out var cache);
-                caches.Add(cache);
-            }
+        //private static List<ImmutableModLinkCache<ISkyrimMod, ISkyrimModGetter>> GetVanillaLinkCaches(
+        //        ILoadOrder<IModListing<ISkyrimModGetter>> loadOrder) {
+        //    if (!TryGetLinkCache("Skyrim.esm", loadOrder, out var skyrim))
+        //        throw new Exception();
+        //    List<ImmutableModLinkCache<ISkyrimMod, ISkyrimModGetter>> caches = [skyrim];
+        //    foreach(var baseMod in Settings?.Value.BaseMods ?? []) {
+        //        TryGetLinkCache(baseMod, loadOrder, out var cache);
+        //        caches.Add(cache);
+        //    }
 
-            return caches
-                .Where((m) => m is not null)
-                .ToList();
-        }
+        //    return caches
+        //        .Where((m) => m is not null)
+        //        .ToList();
+        //}
 
         private static bool TryGetLinkCache(string fileName, ILoadOrder<IModListing<ISkyrimModGetter>> loadOrder, out ImmutableModLinkCache<ISkyrimMod, ISkyrimModGetter> linkCache) {
             linkCache = null;
