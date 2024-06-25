@@ -93,9 +93,7 @@ namespace SpellModCompatibilityPatcher {
             Dictionary<string, Override<TMajorGetter>> overrides = [];
 
             foreach(var modKey in perferredOverrideOrder) {
-                if (!loadOrder.TryGetValue(modKey, out var listing))
-                    continue;
-                if (!overridingMods.TryGetValue(listing, out var records))
+                if (!overridingMods.TryGetValue(modKey, out var records))
                     continue;
                 foreach(var record in records) {
                     if (record.Record.EditorID is null)
@@ -126,17 +124,17 @@ namespace SpellModCompatibilityPatcher {
             return weededOverrides;
         }
 
-        private static Dictionary<IModListing<ISkyrimModGetter>, IEnumerable<IModContext<TMajor>>> GetRecordAddingMods<TMajor, TMajorGetter>(ILoadOrder<IModListing<ISkyrimModGetter>> loadOrder) where TMajor : class, IMajorRecord, IMajorRecordQueryable, TMajorGetter where TMajorGetter : class, IMajorRecordGetter, IMajorRecordQueryableGetter {
-            Dictionary<IModListing<ISkyrimModGetter>, IEnumerable<IModContext<TMajor>>> dict = [];
+        private static Dictionary<ModKey, IEnumerable<IModContext<TMajorGetter>>> GetRecordAddingMods<TMajor, TMajorGetter>(ILoadOrder<IModListing<ISkyrimModGetter>> loadOrder) where TMajor : class, IMajorRecord, IMajorRecordQueryable, TMajorGetter where TMajorGetter : class, IMajorRecordGetter, IMajorRecordQueryableGetter {
+            Dictionary<ModKey, IEnumerable<IModContext<TMajorGetter>>> dict = [];
             foreach (var mod in loadOrder) {
                 if (mod is null || mod.Value is null || mod.Value.Mod is null)
                     continue;
-                var records = mod.Value.Mod.EnumerateMajorRecordSimpleContexts<TMajor>();
+                var records = mod.Value.Mod.EnumerateMajorRecordSimpleContexts<TMajorGetter>();
                 if (records is null)
                     continue;
                 if (!records.Any())
                     continue;
-                dict.Add(mod.Value, records);
+                dict.Add(mod.Key, records);
             }
 
             return dict;
