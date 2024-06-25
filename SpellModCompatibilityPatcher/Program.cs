@@ -8,6 +8,7 @@ using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Synthesis;
 using Noggog;
+using System.Diagnostics;
 
 namespace SpellModCompatibilityPatcher {
     public class Program {
@@ -25,6 +26,9 @@ namespace SpellModCompatibilityPatcher {
         }
 
         private static async Task RunPatch(IPatcherState<ISkyrimMod, ISkyrimModGetter> state) {
+            if (!Debugger.IsAttached)
+                Debugger.Launch();
+
             var vanillaCaches = GetVanillaLinkCaches(state.LoadOrder);
             var vanillaKeys = new HashSet<ModKey>(Settings.Value.BaseMods);
             var spells = state.LoadOrder.PriorityOrder.Spell().WinningContextOverrides(true);
@@ -48,6 +52,9 @@ namespace SpellModCompatibilityPatcher {
 
             PrintOverrides(updatedBookOverridesList);
             PrintOverrides(updatedSpellOverridesList);
+
+            if (!Debugger.IsAttached)
+                Debugger.Launch();
 
             ApplyOverride<IBook, IBookGetter>(state, updatedBookOverridesList);
             ApplyOverride<ISpell, ISpellGetter>(state, updatedSpellOverrides);
