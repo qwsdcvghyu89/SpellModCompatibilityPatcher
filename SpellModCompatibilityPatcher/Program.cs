@@ -90,18 +90,16 @@ namespace SpellModCompatibilityPatcher {
 
         private static IEnumerable<Override<TMajorGetter>> UpdateOverrides<TMajor, TMajorGetter>(ILoadOrder<IModListing<ISkyrimModGetter>> loadOrder, List<ModKey> perferredOverrideOrder) where TMajor : class, IMajorRecord, IMajorRecordQueryable, TMajorGetter where TMajorGetter : class, IMajorRecordGetter, IMajorRecordQueryableGetter {
             var overridingMods = GetRecordAddingMods<TMajor, TMajorGetter>(loadOrder);
-            Dictionary<string, Override<TMajorGetter>> overrides = [];
+            Dictionary<uint, Override<TMajorGetter>> overrides = [];
 
             foreach(var modKey in perferredOverrideOrder) {
                 if (!overridingMods.TryGetValue(modKey, out var records))
                     continue;
                 foreach(var record in records) {
-                    if (record.Record.EditorID is null)
-                        continue;
-                    if (overrides.ContainsKey(record.Record.EditorID))
+                    if (overrides.ContainsKey(record.Record.FormKey.ID))
                         continue;
                     var @override = new Override<TMajorGetter>(null, modKey, null, record.Record);
-                    overrides[record.Record.EditorID] = @override;
+                    overrides[record.Record.FormKey.ID] = @override;
                 }
             }
 
@@ -112,11 +110,9 @@ namespace SpellModCompatibilityPatcher {
             List<Override<TMajorGetter>> weededOverrides = [];
             foreach(var @override in overrides) {
                 var record = @override.OverridingRecord;
-                if (record.EditorID is null)
+                if (!linkCache.TryResolve<TMajorGetter>(@override.OverridingRecord.FormKey, out var originalRecord))
                     continue;
-                if (!linkCache.TryResolve<TMajor>(record.EditorID, out var originalRecord))
-                    continue;
-                if (record.FormKey == originalRecord.FormKey)
+                if (record.FormKey.ModKey == originalRecord.FormKey.ModKey)
                     continue;
                 weededOverrides.Add(new Override<TMajorGetter>(originalRecord.FormKey.ModKey, record.FormKey.ModKey, originalRecord, record));
             }
