@@ -32,7 +32,7 @@ namespace SpellModCompatibilityPatcher {
             var books = state.LoadOrder.PriorityOrder.Book().WinningContextOverrides(true);
             var spellOverrides = GetOverrides(vanillaCaches, vanillaKeys, spells);
             var bookOverrides = GetOverrides(vanillaCaches, vanillaKeys, books, 
-                (x)=>x is IBookSpellGetter); // filter for only spell tomes            
+                (x)=>x.Teaches is IBookSpellGetter); // filter for only spell tomes            
 
             Console.WriteLine("BOOK OVERRIDES ====================");
             PrintOverrides(bookOverrides);
